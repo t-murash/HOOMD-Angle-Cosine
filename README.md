@@ -1,6 +1,6 @@
 # HOOMD-Angle-Cosine
 
-<img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K\cos(\theta-\theta_0)" />
+<img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K\{ 1 - \cos(\theta-\theta_0) \}" />
 
 ![Demo](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif "Demo")
 
