@@ -4,9 +4,7 @@
 
 ![Demo](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif "Demo")
 
-red: k=-10, t0=0
-green: k=0, t0=0
-blue: k=10, t0=0
+red: (k=-10, t0=0), green: (k=0, t0=0), blue: (k=10, t0=0)
 
 Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
