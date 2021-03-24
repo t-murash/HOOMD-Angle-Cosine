@@ -1,5 +1,17 @@
 # HOOMD-Angle-Cosine
 
+<img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K\cos(\theta-\theta_0)" />
+
+![Demo](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif "Demo")
+
+Authored by:
+[Takahiro Murashima](https://github.com/t-murash)<br>
+Tohoku University, Japan<br>
+Initial commit: Mar 07, 2021<br>
+Last updated: Mar 25, 2021<br>
+Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/issues) and/or [email](mailto:murasima@cmpt.phys.tohoku.ac.jp).
+
+
 ## Installation
 Get HOOMD's source file.
 ```
