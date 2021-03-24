@@ -42,6 +42,11 @@ $ ctest
 $ make -j64 install
 ```
 
+## Usage
+```
+$ python angle-cosine-test.py
+```
+
 ## Note
 You need to modify `/usr/include/crt/host.config.h` before building HOOMD.
 
