@@ -7,7 +7,7 @@
 Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
 Tohoku University, Japan<br>
-Initial commit: Mar 07, 2021<br>
+Initial commit: Mar 23, 2021<br>
 Last updated: Mar 25, 2021<br>
 Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/issues) and/or [email](mailto:murasima@cmpt.phys.tohoku.ac.jp).
 
