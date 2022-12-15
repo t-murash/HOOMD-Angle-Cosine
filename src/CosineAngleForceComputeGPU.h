@@ -1,31 +1,33 @@
-// Copyright (c) 2009-2019 The Regents of the University of Michigan
-// This file is part of the HOOMD-blue project, released under the BSD 3-Clause License.
+// Copyright (c) 2009-2022 The Regents of the University of Michigan.
+// Part of HOOMD-blue, released under the BSD 3-Clause License.
 
 /*
   T. Murashima @ Tohoku University
  */
 
-
-
 #include "CosineAngleForceCompute.h"
 #include "CosineAngleForceGPU.cuh"
 #include "hoomd/Autotuner.h"
 
-#include <memory>
 #include <hoomd/extern/nano-signal-slot/nano_signal_slot.hpp>
+#include <memory>
 
 /*! \file CosineAngleForceComputeGPU.h
     \brief Declares the CosineAngleForceGPU class
 */
 
-#ifdef NVCC
+#ifdef __HIPCC__
 #error This header cannot be compiled by nvcc
 #endif
 
 #ifndef __COSINEANGLEFORCECOMPUTEGPU_H__
 #define __COSINEANGLEFORCECOMPUTEGPU_H__
 
-//! Implements the cosine squared angle force calculation on the GPU
+namespace hoomd
+    {
+namespace md
+    {
+//! Implements the cosine angle force calculation on the GPU
 /*! CosineAngleForceComputeGPU implements the same calculations as CosineAngleForceCompute,
     but executing on the GPU.
 
@@ -38,36 +40,25 @@
     \ingroup computes
 */
 class PYBIND11_EXPORT CosineAngleForceComputeGPU : public CosineAngleForceCompute
-{
- public:
-  //! Constructs the compute
-  CosineAngleForceComputeGPU(std::shared_ptr<SystemDefinition> sysdef);
-  //! Destructor
-  ~CosineAngleForceComputeGPU();
+    {
+    public:
+    //! Constructs the compute
+    CosineAngleForceComputeGPU(std::shared_ptr<SystemDefinition> sysdef);
+    //! Destructor
+    ~CosineAngleForceComputeGPU();
 
-  //! Set autotuner parameters
-  /*! \param enable Enable/disable autotuning
-      \param period period (approximate) in time steps when returning occurs
-  */
-  virtual void setAutotunerParams(bool enable, unsigned int period)
-  {
-    CosineAngleForceCompute::setAutotunerParams(enable, period);
-    m_tuner->setPeriod(period);
-    m_tuner->setEnabled(enable);
-  }
+    //! Set the parameters
+    virtual void setParams(unsigned int type, Scalar K, Scalar t_0);
 
-  //! Set the parameters
-  virtual void setParams(unsigned int type, Scalar K, Scalar t_0);
+    protected:
+    std::shared_ptr<Autotuner<1>> m_tuner; //!< Autotuner for block size
+    GPUArray<Scalar2> m_params;            //!< Parameters stored on the GPU
 
- protected:
-  std::unique_ptr<Autotuner> m_tuner; //!< Autotuner for block size
-  GPUArray<Scalar2>  m_params;        //!< Parameters stored on the GPU
+    //! Actually compute the forces
+    virtual void computeForces(uint64_t timestep);
+    };
 
-  //! Actually compute the forces
-  virtual void computeForces(unsigned int timestep);
-};
-
-//! Export the AngleForceComputeGPU class to python
-void export_CosineAngleForceComputeGPU(pybind11::module& m);
+    } // end namespace md
+    } // end namespace hoomd
 
 #endif

@@ -1,25 +1,33 @@
-// Copyright (c) 2009-2019 The Regents of the University of Michigan
-// This file is part of the HOOMD-blue project, released under the BSD 3-Clause License.
+// Copyright (c) 2009-2022 The Regents of the University of Michigan.
+// Part of HOOMD-blue, released under the BSD 3-Clause License.
+
 /*
   T. Murashima @ Tohoku University
  */
 
-
+#include "hip/hip_runtime.h"
+// Copyright (c) 2009-2021 The Regents of the University of Michigan
+// This file is part of the HOOMD-blue project, released under the BSD 3-Clause License.
 
 #include "CosineAngleForceGPU.cuh"
 #include "hoomd/TextureTools.h"
 
 #include <assert.h>
 
-// SMALL a relatively small number
-#define SMALL Scalar(0.001)
-
 /*! \file CosineAngleForceGPU.cu
-    \brief Defines GPU kernel code for calculating the cosine squared angle forces. Used by
+    \brief Defines GPU kernel code for calculating the cosine angle forces. Used by
     CosineAngleForceComputeGPU.
 */
 
-//! Kernel for calculating cosine squared angle forces on the GPU
+#define SMALL Scalar(0.001)
+
+namespace hoomd
+    {
+namespace md
+    {
+namespace kernel
+    {
+//! Kernel for calculating cosine angle forces on the GPU
 /*! \param d_force Device memory to write computed forces
     \param d_virial Device memory to write computed virials
     \param virial_pitch Pitch of 2D virial array
@@ -31,176 +39,249 @@
     \param pitch Pitch of 2D angles list
     \param n_angles_list List of numbers of angles stored on the GPU
 */
-extern "C" __global__ void gpu_compute_cosine_angle_forces_kernel(Scalar4* d_force,
-								  Scalar* d_virial,
-								  const unsigned int virial_pitch,
-								  const unsigned int N,
-								  const Scalar4 *d_pos,
-								  const Scalar2 *d_params,
-								  BoxDim box,
-								  const group_storage<3> *alist,
-								  const unsigned int *apos_list,
-								  const unsigned int pitch,
-								  const unsigned int *n_angles_list)
+__global__ void gpu_compute_cosine_angle_forces_kernel(Scalar4* d_force,
+                                                         Scalar* d_virial,
+                                                         const size_t virial_pitch,
+                                                         const unsigned int N,
+                                                         const Scalar4* d_pos,
+                                                         const Scalar2* d_params,
+                                                         BoxDim box,
+                                                         const group_storage<3>* alist,
+                                                         const unsigned int* apos_list,
+                                                         const unsigned int pitch,
+                                                         const unsigned int* n_angles_list)
     {
-      // start by identifying which particle we are to handle
-      int idx = blockIdx.x * blockDim.x + threadIdx.x;
+    // start by identifying which particle we are to handle
+    int idx = blockIdx.x * blockDim.x + threadIdx.x;
 
-      if (idx >= N)
+    if (idx >= N)
         return;
 
-      // load in the length of the list for this thread (MEM TRANSFER: 4 bytes)
-      int n_angles = n_angles_list[idx];
+    // load in the length of the list for this thread (MEM TRANSFER: 4 bytes)
+    int n_angles = n_angles_list[idx];
 
-      // read in the position of our b-particle from the a-b-c triplet. (MEM TRANSFER: 16 bytes)
-      Scalar4 idx_postype = d_pos[idx];  // we can be either a, b, or c in the a-b-c triplet
-      Scalar3 idx_pos = make_scalar3(idx_postype.x, idx_postype.y, idx_postype.z);
-      Scalar3 a_pos,b_pos,c_pos; // allocate space for the a,b, and c atom in the a-b-c triplet
+    // read in the position of our b-particle from the a-b-c triplet. (MEM TRANSFER: 16 bytes)
+    Scalar4 idx_postype = d_pos[idx]; // we can be either a, b, or c in the a-b-c triplet
+    Scalar3 idx_pos = make_scalar3(idx_postype.x, idx_postype.y, idx_postype.z);
+    Scalar3 a_pos, b_pos, c_pos; // allocate space for the a,b, and c atom in the a-b-c triplet
 
-      // initialize the force to 0
-      Scalar4 force_idx = make_scalar4(Scalar(0.0), Scalar(0.0), Scalar(0.0), Scalar(0.0));
+    // initialize the force to 0
+    Scalar4 force_idx = make_scalar4(Scalar(0.0), Scalar(0.0), Scalar(0.0), Scalar(0.0));
 
-      Scalar fab[3], fcb[3];
+    //Scalar fab[3], fcb[3];
+    Scalar fab[3], fbc[3];
 
-      // initialize the virial to 0
-      Scalar virial[6];
-      for (int i = 0; i < 6; i++)virial[i] = Scalar(0.0);
 
-      // loop over all angles
-      for (int angle_idx = 0; angle_idx < n_angles; angle_idx++)
+    // initialize the virial to 0
+    Scalar virial[6];
+    for (int i = 0; i < 6; i++)
+        virial[i] = Scalar(0.0);
+
+    // loop over all angles
+    for (int angle_idx = 0; angle_idx < n_angles; angle_idx++)
         {
-	  group_storage<3> cur_angle = alist[pitch*angle_idx + idx];
+        group_storage<3> cur_angle = alist[pitch * angle_idx + idx];
 
-	  int cur_angle_x_idx = cur_angle.idx[0];
-	  int cur_angle_y_idx = cur_angle.idx[1];
-	  int cur_angle_type = cur_angle.idx[2];
+        int cur_angle_x_idx = cur_angle.idx[0];
+        int cur_angle_y_idx = cur_angle.idx[1];
+        int cur_angle_type = cur_angle.idx[2];
 
-	  int cur_angle_abc = apos_list[pitch*angle_idx + idx];
+        int cur_angle_abc = apos_list[pitch * angle_idx + idx];
 
-	  // get the a-particle's position (MEM TRANSFER: 16 bytes)
-	  Scalar4 x_postype = d_pos[cur_angle_x_idx];
-	  Scalar3 x_pos = make_scalar3(x_postype.x, x_postype.y, x_postype.z);
-	  // get the c-particle's position (MEM TRANSFER: 16 bytes)
-	  Scalar4 y_postype = d_pos[cur_angle_y_idx];
-	  Scalar3 y_pos = make_scalar3(y_postype.x, y_postype.y, y_postype.z);
+        // get the a-particle's position (MEM TRANSFER: 16 bytes)
+        Scalar4 x_postype = d_pos[cur_angle_x_idx];
+        Scalar3 x_pos = make_scalar3(x_postype.x, x_postype.y, x_postype.z);
+        // get the c-particle's position (MEM TRANSFER: 16 bytes)
+        Scalar4 y_postype = d_pos[cur_angle_y_idx];
+        Scalar3 y_pos = make_scalar3(y_postype.x, y_postype.y, y_postype.z);
 
-	  if (cur_angle_abc == 0)
+        if (cur_angle_abc == 0)
             {
-	      a_pos = idx_pos;
-	      b_pos = x_pos;
-	      c_pos = y_pos;
+            a_pos = idx_pos;
+            b_pos = x_pos;
+            c_pos = y_pos;
             }
-	  if (cur_angle_abc == 1)
+        if (cur_angle_abc == 1)
             {
-	      b_pos = idx_pos;
-	      a_pos = x_pos;
-	      c_pos = y_pos;
+            b_pos = idx_pos;
+            a_pos = x_pos;
+            c_pos = y_pos;
             }
-	  if (cur_angle_abc == 2)
+        if (cur_angle_abc == 2)
             {
-	      c_pos = idx_pos;
-	      a_pos = x_pos;
-	      b_pos = y_pos;
+            c_pos = idx_pos;
+            a_pos = x_pos;
+            b_pos = y_pos;
             }
 
-	  // calculate dr for a-b,c-b,and a-c
-	  Scalar3 dab = a_pos - b_pos;
-	  Scalar3 dcb = c_pos - b_pos;
-	  Scalar3 dac = a_pos - c_pos;
+        // calculate dr for a-b,c-b,and a-c
+        Scalar3 dab = a_pos - b_pos;
+        //Scalar3 dcb = c_pos - b_pos;
+	Scalar3 dbc = b_pos - c_pos;
+        Scalar3 dac = a_pos - c_pos;
 
-	  // apply periodic boundary conditions
-	  dab = box.minImage(dab);
-	  dcb = box.minImage(dcb);
-	  dac = box.minImage(dac);
+        // apply periodic boundary conditions
+        dab = box.minImage(dab);
+        //dcb = box.minImage(dcb);
+	dbc = box.minImage(dbc);
+        dac = box.minImage(dac);
 
-	  // get the angle parameters (MEM TRANSFER: 8 bytes)
-	  Scalar2 params = __ldg(d_params + cur_angle_type);
-	  Scalar K = params.x;
-	  Scalar t_0 = params.y;
+        // get the angle parameters (MEM TRANSFER: 8 bytes)
+        Scalar2 params = __ldg(d_params + cur_angle_type);
+        Scalar K = params.x;
+        Scalar t_0 = params.y;
 
-	  Scalar rsqab = dot(dab, dab);
-	  Scalar rab = fast::sqrt(rsqab);
-	  Scalar rsqcb = dot(dcb, dcb);
-	  Scalar rcb = fast::sqrt(rsqcb);
+        Scalar rsqab = dot(dab, dab);
+        Scalar rab = fast::sqrt(rsqab);
 
-	  Scalar c_abbc = dot(dab, dcb);
-	  c_abbc /= rab*rcb;  // cos(t)
-
-	  if (c_abbc >  Scalar(1.0)) c_abbc =  Scalar(1.0);
-	  if (c_abbc < -Scalar(1.0)) c_abbc = -Scalar(1.0);
-
-	  // actually calculate the force
-
-	  Scalar s_abbc   = Scalar(0.0); //TM 2021/01/07
-	  Scalar cot_abbc = Scalar(0.0); //TM 2021/01/07
-	  Scalar c0 = Scalar(1.0);       //TM 2021/01/07
-	  Scalar s0 = Scalar(0.0);       //TM 2021/01/07
-	
-	  if (t_0 > Scalar(0.0)){
-	    s_abbc = fast::sqrt(Scalar(1.0)-c_abbc*c_abbc); //TM 2021/01/07
-	    if (s_abbc < SMALL) s_abbc = SMALL;             //TM 2021/01/07
-	    s_abbc = Scalar(1.0) / s_abbc;                  //TM 2021/01/07
-	    cot_abbc = c_abbc / s_abbc;                     //TM 2021/01/07
-	    c0=fast::cos(t_0);                              //TM 2021/01/07
-	    s0=fast::sin(t_0);                              //TM 2021/01/07
-	  }
-
-	  Scalar dcosth = c_abbc*c0 + s_abbc*s0; //TM 2021/01/07
-	  Scalar tk = K*(Scalar(1.0)-dcosth);    //TM 2021/01/07
-	  Scalar a = K*(-c0 + cot_abbc * s0);    //TM 2021/01/07
-	  Scalar a11 =  a * c_abbc / rsqab;
-	  Scalar a12 = -a / (rab * rcb);
-	  Scalar a22 =  a * c_abbc / rsqcb;
-
-	  fab[0] = a11*dab.x + a12*dcb.x;
-	  fab[1] = a11*dab.y + a12*dcb.y;
-	  fab[2] = a11*dab.z + a12*dcb.z;
-
-	  fcb[0] = a22*dcb.x + a12*dab.x;
-	  fcb[1] = a22*dcb.y + a12*dab.y;
-	  fcb[2] = a22*dcb.z + a12*dab.z;
-
-	  // the rest should be the same as for the harmonic bond
-	  // compute 1/3 of the energy, 1/3 for each atom in the angle
-	  Scalar angle_eng = tk*Scalar(Scalar(1.0)/Scalar(3.0)); //TM 2021/01/07
-
-	  // upper triangular version of virial tensor
-	  Scalar angle_virial[6];
-	  angle_virial[0] = Scalar(1./3.)*(dab.x*fab[0] + dcb.x*fcb[0]);
-	  angle_virial[1] = Scalar(1./3.)*(dab.y*fab[0] + dcb.y*fcb[0]);
-	  angle_virial[2] = Scalar(1./3.)*(dab.z*fab[0] + dcb.z*fcb[0]);
-	  angle_virial[3] = Scalar(1./3.)*(dab.y*fab[1] + dcb.y*fcb[1]);
-	  angle_virial[4] = Scalar(1./3.)*(dab.z*fab[1] + dcb.z*fcb[1]);
-	  angle_virial[5] = Scalar(1./3.)*(dab.z*fab[2] + dcb.z*fcb[2]);
+	/*
+        Scalar rsqcb = dot(dcb, dcb);
+        Scalar rcb = fast::sqrt(rsqcb);
+	*/
+	Scalar rsqbc = dot(dbc, dbc);
+        Scalar rbc = fast::sqrt(rsqbc);
 
 
-	  if (cur_angle_abc == 0)
+	/*
+        Scalar c_abbc = dot(dab, dcb);
+        c_abbc /= rab * rcb; // cos(t)
+	*/
+	Scalar c_abbc = dot(dab, dbc);
+        c_abbc /= rab * rbc; // cos(t)
+
+
+        if (c_abbc > Scalar(1.0))
+            c_abbc = Scalar(1.0);
+        if (c_abbc < -Scalar(1.0))
+            c_abbc = -Scalar(1.0);
+
+        // actually calculate the force
+        // should the user pass cos(t_0) so that it's not calculated each time for each angle?
+	/*
+        Scalar dcosth = c_abbc - fast::cos(t_0);
+        Scalar tk = K * dcosth;
+        Scalar a = Scalar(1.0) * tk;
+	*/
+	Scalar s_abbc   = Scalar(0.0); //TM 2022/12/13
+	Scalar cot_abbc = Scalar(0.0); //TM 2022/12/13
+	Scalar c0 = Scalar(1.0);       //TM 2022/12/13
+	Scalar s0 = Scalar(0.0);       //TM 2022/12/13
+	s_abbc = fast::sqrt(Scalar(1.0)-c_abbc*c_abbc); //TM 2022/12/15
+	//if (s_abbc < SMALL) s_abbc = SMALL;             //TM 2022/12/15
+	//s_abbc = Scalar(1.0) / s_abbc;                  //TM 2022/12/15
+	if (s_abbc < SMALL) {
+	  cot_abbc = c_abbc / SMALL;                     //TM 2022/12/15
+	}else{
+	  cot_abbc = c_abbc / s_abbc;                     //TM 2022/12/15
+	}
+	c0=fast::cos(t_0);                              //TM 2022/12/15
+	s0=fast::sin(t_0);                              //TM 2022/12/15
+	Scalar dcosth = c_abbc*c0 + s_abbc*s0; //TM 2022/12/13
+	Scalar tk = K*(Scalar(1.0)-dcosth);    //TM 2022/12/15
+	Scalar a = K*(c0 - cot_abbc * s0);    //TM 2022/12/15
+	  
+        Scalar a11 = -a * c_abbc / rsqab; // TM 2022/12/15
+
+	/*
+        Scalar a12 = +a / (rab * rcb);   // TM 2022/12/15
+        Scalar a22 = -a * c_abbc / rsqcb; // TM 2022/12/15
+	*/
+	Scalar a12 = +a / (rab * rbc);   // TM 2022/12/15
+        Scalar a22 = -a * c_abbc / rsqbc; // TM 2022/12/15
+
+	/*
+        fab[0] = a11 * dab.x + a12 * dcb.x;
+        fab[1] = a11 * dab.y + a12 * dcb.y;
+        fab[2] = a11 * dab.z + a12 * dcb.z;
+	*/
+	fab[0] = a11 * dab.x + a12 * dbc.x;
+        fab[1] = a11 * dab.y + a12 * dbc.y;
+        fab[2] = a11 * dab.z + a12 * dbc.z;
+
+	/*
+        fcb[0] = a22 * dcb.x + a12 * dab.x;
+        fcb[1] = a22 * dcb.y + a12 * dab.y;
+        fcb[2] = a22 * dcb.z + a12 * dab.z;
+	*/
+
+	fbc[0] = -a22 * dbc.x - a12 * dab.x;
+        fbc[1] = -a22 * dbc.y - a12 * dab.y;
+        fbc[2] = -a22 * dbc.z - a12 * dab.z;
+
+
+
+        // the rest should be the same as for the harmonic bond
+        // compute 1/3 of the energy, 1/3 for each atom in the angle
+	/*
+        Scalar angle_eng = tk * dcosth * Scalar(Scalar(1.0) / Scalar(6.0));
+	*/
+	Scalar angle_eng = tk*Scalar(Scalar(1.0)/Scalar(3.0)); //TM 2022/12/13
+
+        // upper triangular version of virial tensor
+        Scalar angle_virial[6];
+	/*
+        angle_virial[0] = Scalar(1. / 3.) * (dab.x * fab[0] + dcb.x * fcb[0]);
+        angle_virial[1] = Scalar(1. / 3.) * (dab.y * fab[0] + dcb.y * fcb[0]);
+        angle_virial[2] = Scalar(1. / 3.) * (dab.z * fab[0] + dcb.z * fcb[0]);
+        angle_virial[3] = Scalar(1. / 3.) * (dab.y * fab[1] + dcb.y * fcb[1]);
+        angle_virial[4] = Scalar(1. / 3.) * (dab.z * fab[1] + dcb.z * fcb[1]);
+        angle_virial[5] = Scalar(1. / 3.) * (dab.z * fab[2] + dcb.z * fcb[2]);
+	*/
+
+	angle_virial[0] = Scalar(1. / 3.) * (dab.x * fab[0] + dbc.x * fbc[0]);
+        angle_virial[1] = Scalar(1. / 3.) * (dab.y * fab[0] + dbc.y * fbc[0]);
+        angle_virial[2] = Scalar(1. / 3.) * (dab.z * fab[0] + dbc.z * fbc[0]);
+        angle_virial[3] = Scalar(1. / 3.) * (dab.y * fab[1] + dbc.y * fbc[1]);
+        angle_virial[4] = Scalar(1. / 3.) * (dab.z * fab[1] + dbc.z * fbc[1]);
+        angle_virial[5] = Scalar(1. / 3.) * (dab.z * fab[2] + dbc.z * fbc[2]);
+
+
+
+        if (cur_angle_abc == 0)
             {
 	      force_idx.x += fab[0];
 	      force_idx.y += fab[1];
 	      force_idx.z += fab[2];
             }
-	  if (cur_angle_abc == 1)
+        if (cur_angle_abc == 1)
             {
+	      /*
 	      force_idx.x -= fab[0] + fcb[0];
 	      force_idx.y -= fab[1] + fcb[1];
 	      force_idx.z -= fab[2] + fcb[2];
+	      */
+
+	      force_idx.x -= fab[0] + fbc[0];
+	      force_idx.y -= fab[1] + fbc[1];
+	      force_idx.z -= fab[2] + fbc[2];
+
+
             }
-	  if (cur_angle_abc == 2)
+        if (cur_angle_abc == 2)
             {
+	      /*
 	      force_idx.x += fcb[0];
 	      force_idx.y += fcb[1];
 	      force_idx.z += fcb[2];
+	      */
+
+	      force_idx.x += fbc[0];
+	      force_idx.y += fbc[1];
+	      force_idx.z += fbc[2];
+
+
             }
 
-	  force_idx.w += angle_eng;
+        force_idx.w += angle_eng;
 
-	  for (int i = 0; i < 6; i++)virial[i] += angle_virial[i];
+        for (int i = 0; i < 6; i++)
+            virial[i] += angle_virial[i];
         }
 
-      // now that the force calculation is complete, write out the result (MEM TRANSFER: 20 bytes)
-      d_force[idx] = force_idx;
-      for (int i = 0; i < 6; i++)d_virial[i*virial_pitch+idx] = virial[i];
+    // now that the force calculation is complete, write out the result (MEM TRANSFER: 20 bytes)
+    d_force[idx] = force_idx;
+    for (int i = 0; i < 6; i++)
+        d_virial[i * virial_pitch + idx] = virial[i];
     }
 
 /*! \param d_force Device memory to write computed forces
@@ -217,43 +298,59 @@ extern "C" __global__ void gpu_compute_cosine_angle_forces_kernel(Scalar4* d_for
     \param block_size Block size to use when performing calculations
 
     \returns Any error code resulting from the kernel launch
-    \note Always returns cudaSuccess in release builds to avoid the cudaThreadSynchronize()
+    \note Always returns hipSuccess in release builds to avoid the hipDeviceSynchronize()
 
-    \a d_params should include one Scalar2 element per angle type. The x component contains K the stiffness constant
-    and the y component contains t_0 the equilibrium angle.
+    \a d_params should include one Scalar2 element per angle type. The x component contains K the
+   spring constant and the y component contains t_0 the equilibrium angle.
 */
-cudaError_t gpu_compute_cosine_angle_forces(Scalar4* d_force,
-					    Scalar* d_virial,
-					    const unsigned int virial_pitch,
-					    const unsigned int N,
-					    const Scalar4 *d_pos,
-					    const BoxDim& box,
-					    const group_storage<3> *atable,
-					    const unsigned int *apos_list,
-					    const unsigned int pitch,
-					    const unsigned int *n_angles_list,
-					    Scalar2 *d_params,
-					    unsigned int n_angle_types,
-					    int block_size)
-{
-  assert(d_params);
-
-  static unsigned int max_block_size = UINT_MAX;
-  if (max_block_size == UINT_MAX)
+hipError_t gpu_compute_cosine_angle_forces(Scalar4* d_force,
+                                             Scalar* d_virial,
+                                             const size_t virial_pitch,
+                                             const unsigned int N,
+                                             const Scalar4* d_pos,
+                                             const BoxDim& box,
+                                             const group_storage<3>* atable,
+                                             const unsigned int* apos_list,
+                                             const unsigned int pitch,
+                                             const unsigned int* n_angles_list,
+                                             Scalar2* d_params,
+                                             unsigned int n_angle_types,
+                                             int block_size)
     {
-      cudaFuncAttributes attr;
-      cudaFuncGetAttributes(&attr, (const void *)gpu_compute_cosine_angle_forces_kernel);
-      max_block_size = attr.maxThreadsPerBlock;
+    assert(d_params);
+
+    unsigned int max_block_size;
+    hipFuncAttributes attr;
+    hipFuncGetAttributes(&attr, (const void*)gpu_compute_cosine_angle_forces_kernel);
+    max_block_size = attr.maxThreadsPerBlock;
+
+    unsigned int run_block_size = min(block_size, max_block_size);
+
+    // setup the grid to run the kernel
+    dim3 grid(N / run_block_size + 1, 1, 1);
+    dim3 threads(run_block_size, 1, 1);
+
+    // run the kernel
+    hipLaunchKernelGGL((gpu_compute_cosine_angle_forces_kernel),
+                       dim3(grid),
+                       dim3(threads),
+                       0,
+                       0,
+                       d_force,
+                       d_virial,
+                       virial_pitch,
+                       N,
+                       d_pos,
+                       d_params,
+                       box,
+                       atable,
+                       apos_list,
+                       pitch,
+                       n_angles_list);
+
+    return hipSuccess;
     }
 
-  unsigned int run_block_size = min(block_size, max_block_size);
-
-  // setup the grid to run the kernel
-  dim3 grid( N / run_block_size + 1, 1, 1);
-  dim3 threads(run_block_size, 1, 1);
-  
-  // run the kernel
-  gpu_compute_cosine_angle_forces_kernel<<< grid, threads>>>(d_force, d_virial, virial_pitch, N, d_pos, d_params, box,
-							     atable, apos_list, pitch, n_angles_list);
-  return cudaSuccess;
-}
+    } // end namespace kernel
+    } // end namespace md
+    } // end namespace hoomd
