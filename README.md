@@ -2,7 +2,7 @@
 
 <img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K[1-\cos(\theta-\theta_0)]" />
 
-![Demo](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif "Demo")
+<img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif width=400px alt="Demo">
 
 red: (k=10, t0=0), green: (k=0, t0=0), blue: (k=-10, t0=0)
 
