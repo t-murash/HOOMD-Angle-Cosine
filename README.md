@@ -49,7 +49,7 @@ $ python example/angle-cosine-test.py
 Please see `example/angle-cosine-test.py`.
 
 ## Note
-You need to modify `/usr/include/crt/host.config.h` before building HOOMD.
+If you meet "unsupported GNU version", you need to modify `/usr/include/crt/host.config.h` before building HOOMD.
 
 L138
 ```
