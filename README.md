@@ -4,7 +4,7 @@
 
 <img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif width=400px alt="Demo">
 
-red: (k=10, t0=0), green: (k=0, t0=0), blue: (k=-10, t0=0)
+red: (k=10, &theta;0=0), green: (k=0, &theta;0=0), blue: (k=-10, &theta;0=0)
 
 <img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/hoomd-angle-cosine.png width=400px alt="Def.">
 
