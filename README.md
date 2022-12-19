@@ -55,7 +55,7 @@ Please see `example/angle-cosine-test.py`.
 
 ## Troubleshoot
 
-1. If you failed to install or run the above example, test the following commands.
+1. If you failed to install or failed to run the above example, test the following commands.
 
 ```
 $ cd hoomd-blue-v3.7.0
