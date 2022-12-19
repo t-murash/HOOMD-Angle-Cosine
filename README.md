@@ -1,6 +1,7 @@
 # HOOMD-Angle-Cosine
+This package is a patch for HOOMD-blue, providing an angle potential
+<img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K[1-\cos(\theta-\theta_0)]" />, which is commonly used in polymer's community.
 
-<img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K[1-\cos(\theta-\theta_0)]" />
 
 <img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif width=400px alt="Demo">
 
