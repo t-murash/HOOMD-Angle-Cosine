@@ -62,7 +62,6 @@ $ cd hoomd-blue-v3.7.0
 $ python3 install-prereq-headers.py
 $ python3 -m pip install numpy
 $ python3 -m pip install gsd
-$ python3 -m pip install fresnel
 ```
 
 
