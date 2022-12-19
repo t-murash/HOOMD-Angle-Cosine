@@ -54,7 +54,19 @@ Please see `example/angle-cosine-test.py`.
 - [Derivation of angle force field](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/doc/Angle-Cosine.pdf)
 
 ## Troubleshoot
-If you meet "unsupported GNU version" error, you need to modify `/usr/include/crt/host.config.h` before building HOOMD-blue.
+
+1. If you failed to install or run the above example, test the following commands.
+
+```
+$ cd hoomd-blue-v3.7.0
+$ python3 install-prereq-headers.py
+$ python3 -m pip install numpy
+$ python3 -m pip install gsd
+$ python3 -m pip install fresnel
+```
+
+
+2. If you meet "unsupported GNU version" error, you need to modify `/usr/include/crt/host.config.h` before building HOOMD-blue.
 
 L138
 ```
