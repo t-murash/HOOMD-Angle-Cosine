@@ -4,11 +4,11 @@ This package is for HOOMD-blue, providing an angle potential<br>
 which is commonly used in polymer's community.
 
 
-<img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/movie.gif width=400px alt="Demo">
+<img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/fig/movie.gif width=400px alt="Demo">
 
 red: (k=10, &theta;<sub>0</sub>=0), green: (k=0, &theta;<sub>0</sub>=0), blue: (k=-10, &theta;<sub>0</sub>=0)
 
-<img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/hoomd-angle-cosine.png width=400px alt="Def.">
+<img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/fig/hoomd-angle-cosine.png width=400px alt="Def.">
 
 Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
@@ -51,7 +51,7 @@ $ python example/angle-cosine-test.py
 Please see `example/angle-cosine-test.py`.
 
 ## Technical note
-- [Derivation of angle force field](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/Angle-Cosine.pdf)
+- [Derivation of angle force field](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/doc/Angle-Cosine.pdf)
 
 ## Troubleshoot
 If you meet "unsupported GNU version" error, you need to modify `/usr/include/crt/host.config.h` before building HOOMD-blue.
