@@ -36,6 +36,7 @@ Then, build HOOMD
 
 ```
 $ cd hoomd-blue-v3.7.0
+$ python3 install-prereq-headers.py
 $ mkdir build
 $ cd build
 $ cmake ../ -DCMAKE_INSTALL_PREFIX=`python3 -c "import site; print(site.getsitepackages()[0])"` -DCMAKE_CXX_FLAGS="-march=native" -DCMAKE_C_FLAGS="-march=native" -DENABLE_GPU=ON -DENABLE_MPI=OFF -DSINGLE_PRECISION=ON
@@ -63,17 +64,7 @@ $ python3 -m pip install numpy gsd
 
 ## Troubleshoot
 
-1. If you failed to install or failed to run the above example, test the following commands.
-
-```
-$ cd hoomd-blue-v3.7.0
-$ python3 install-prereq-headers.py
-$ python3 -m pip install numpy
-$ python3 -m pip install gsd
-```
-
-
-2. If you meet "unsupported GNU version" error, you need to modify `/usr/include/crt/host.config.h` before building HOOMD-blue.
+If you meet "unsupported GNU version" error, you need to modify `/usr/include/crt/host.config.h` before building HOOMD-blue.
 
 L138
 ```
