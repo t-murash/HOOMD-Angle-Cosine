@@ -1,9 +1,5 @@
-// Copyright (c) 2009-2022 The Regents of the University of Michigan.
-// Part of HOOMD-blue, released under the BSD 3-Clause License.
-
-/*
-  T. Murashima @ Tohoku University
- */
+// Copyright (c) 2021-2022 Takahiro Murashima @ Tohoku University
+// under the BSD 3-Clause License.
 
 #include "CosineAngleForceCompute.h"
 #include "CosineAngleForceGPU.cuh"

@@ -1,6 +1,9 @@
 # Copyright (c) 2009-2022 The Regents of the University of Michigan.
 # Part of HOOMD-blue, released under the BSD 3-Clause License.
 
+# Copyright (c) 2021-2022 Takahiro Murashima @ Tohoku University
+# under the BSD 3-Clause License.
+
 r"""Angle forces.
 
 Angle force classes apply a force and virial on every particle in the simulation
