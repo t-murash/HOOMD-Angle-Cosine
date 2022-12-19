@@ -50,6 +50,14 @@ $ python example/angle-cosine-test.py
 ```
 Please see `example/angle-cosine-test.py`.
 
+This script requires `numpy` and `gsd`.
+- [NumPy](https://numpy.org/)
+- [gsd](https://github.com/glotzerlab/gsd)
+Install `numpy` and `gsd` (if you have not installed these python modules)
+```
+$ python3 -m pip install numpy gsd
+```
+
 ## Technical note
 - [Derivation of angle force field](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/doc/Angle-Cosine.pdf)
 
