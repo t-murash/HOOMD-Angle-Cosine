@@ -12,12 +12,12 @@ Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
 Tohoku University, Japan<br>
 Initial commit: Mar 23, 2021<br>
-Last updated: Dec 17, 2022<br>
+Last updated: Dec 19, 2022<br>
 Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/issues) and/or [email](mailto:murasima@cmpt.phys.tohoku.ac.jp).
 
 
 ## Installation
-Get HOOMD's source file.
+Get HOOMD-blue's source file.
 ```
 $ wget https://glotzerlab.engin.umich.edu/Downloads/hoomd/hoomd-v3.7.0.tar.gz
 $ tar zxvf hoomd-v3.7.0.tar.gz
@@ -48,8 +48,11 @@ $ python example/angle-cosine-test.py
 ```
 Please see `example/angle-cosine-test.py`.
 
-## Note
-If you meet "unsupported GNU version", you need to modify `/usr/include/crt/host.config.h` before building HOOMD.
+## Technical note
+- [Derivation of angle force field](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/Angle-Cosine.pdf)
+
+## Troubleshoot
+If you meet "unsupported GNU version" error, you need to modify `/usr/include/crt/host.config.h` before building HOOMD-blue.
 
 L138
 ```
