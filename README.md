@@ -1,7 +1,7 @@
 # HOOMD-Angle-Cosine
 This is an extention package for HOOMD-blue, providing an angle potential<br>
 <img src="https://latex.codecogs.com/gif.latex?&space;U(\theta)=K[1-\cos(\theta-\theta_0)]" /> <br>
-which is commonly used in polymer's community [ [1](https://pubs.rsc.org/en/content/articlepdf/1999/cp/a809796h) [2](https://pubs.acs.org/doi/pdf/10.1021/ma000058y) [3](https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/1439-7641(20010316)2:3%3C180::AID-CPHC180%3E3.0.CO;2-Z) [4](https://pubs.acs.org/doi/10.1021/acs.macromol.9b02428) ].
+which is commonly used in polymer's community [ [1](https://pubs.rsc.org/en/content/articlelanding/1999/CP/a809796h) [2](https://pubs.acs.org/doi/10.1021/ma000058y) [3](https://chemistry-europe.onlinelibrary.wiley.com/doi/10.1002/1439-7641(20010316)2:3%3C180::AID-CPHC180%3E3.0.CO;2-Z) [4](https://pubs.acs.org/doi/10.1021/acs.macromol.9b02428) ].
 
 
 <img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/fig/movie.gif width=400px alt="Demo">
