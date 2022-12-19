@@ -165,9 +165,9 @@ void CosineAngleForceCompute::computeForces(uint64_t timestep)
         dcb.z = h_pos.data[idx_c].z - h_pos.data[idx_b].z;
 	*/
 	Scalar3 dbc;
-        dbc.x = h_pos.data[idx_b].x - h_pos.data[idx_b].x;
-        dbc.y = h_pos.data[idx_b].y - h_pos.data[idx_b].y;
-        dbc.z = h_pos.data[idx_b].z - h_pos.data[idx_b].z;
+        dbc.x = h_pos.data[idx_b].x - h_pos.data[idx_c].x;
+        dbc.y = h_pos.data[idx_b].y - h_pos.data[idx_c].y;
+        dbc.z = h_pos.data[idx_b].z - h_pos.data[idx_c].z;
 
         Scalar3 dac;
         dac.x = h_pos.data[idx_a].x - h_pos.data[idx_c].x; // used for the 1-3 JL interaction
