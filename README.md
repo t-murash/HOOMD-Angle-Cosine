@@ -6,7 +6,7 @@ which is commonly used in polymer's community <sup>[1](https://pubs.rsc.org/en/c
 
 <img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/fig/movie.gif width=400px alt="Demo">
 
-red: (k=10, &theta;<sub>0</sub>=0), green: (k=0, &theta;<sub>0</sub>=0), blue: (k=-10, &theta;<sub>0</sub>=0)
+Red: (k=10, &theta;<sub>0</sub>=0), Green: (k=0, &theta;<sub>0</sub>=0), Blue: (k=-10, &theta;<sub>0</sub>=0)
 
 <img src=https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/fig/hoomd-angle-cosine.png width=400px alt="Def.">
 
