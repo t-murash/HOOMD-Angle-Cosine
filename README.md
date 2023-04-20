@@ -52,6 +52,7 @@ $ cp HOOMD-Angle-Cosine/src/* hoomd-v3.11.0/hoomd/md/.
 Then, build HOOMD-blue
 
 ```
+$ conda activate hoomd-v3.11
 $ cd hoomd-v3.11.0
 $ mkdir build
 $ cd build
@@ -63,6 +64,7 @@ $ make install
 
 ## Usage
 ```
+$ conda activate hoomd-v3.11
 $ python example/angle-cosine-test.py
 ```
 Please see `example/angle-cosine-test.py`.
