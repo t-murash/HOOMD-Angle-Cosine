@@ -91,6 +91,8 @@ should be comented out.
 
 Users of this package are encouraged to cite the following article in scientific publications:
 
+* J. A. Anderson, J. Glaser, S. C. Glotzer, "HOOMD-blue: A Python package for high-performance molecular dynamics and hard particle Monte Carlo simulations", *Computational Materials Science*, (2020) **173** 109363, https://doi.org/10.1016/j.commatsci.2019.109363.
+
 * K. Hagita, T. Murashima, "Molecular Dynamics Simulations of Ring Shapes on a Ring Fraction in Ring-Linear Polymer Blends", *Macromolecules*, (2021) **54** (17) 8043-8051, https://doi.org/10.1021/acs.macromol.1c00656.
 
 
