@@ -20,6 +20,8 @@ Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/iss
 
 
 ## Preparation
+
+```
 $ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
 $ bash Miniconda3-latest-Linux-x86_64.sh
 $ conda update --all
@@ -30,6 +32,7 @@ $ conda install -c omnia eigen3
 $ conda install -c conda-forge cereal
 $ conda install numpy
 $ conda install -c conda-forge gsd
+```
 
 
 ## Installation
