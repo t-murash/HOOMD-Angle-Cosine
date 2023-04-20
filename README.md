@@ -15,35 +15,47 @@ Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
 Tohoku University, Japan<br>
 Initial commit: Mar 23, 2021<br>
-Last updated: Dec 19, 2022<br>
+Last updated: Apr 20, 2023<br>
 Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/issues) and/or [email](mailto:murasima@cmpt.phys.tohoku.ac.jp).
+
+
+## Preparation
+$ wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+$ bash Miniconda3-latest-Linux-x86_64.sh
+$ conda update --all
+$ conda create -n hoomd-v3.11 python=3.10
+$ conda activate hoomd-v3.11
+$ conda install pybind11
+$ conda install -c omnia eigen3
+$ conda install -c conda-forge cereal
+$ conda install numpy
+$ conda install -c conda-forge gsd
 
 
 ## Installation
 Get HOOMD-blue's source file.
 ```
-$ wget https://glotzerlab.engin.umich.edu/Downloads/hoomd/hoomd-v3.7.0.tar.gz
-$ tar zxvf hoomd-v3.7.0.tar.gz
+$ wget https://github.com/glotzerlab/hoomd-blue/releases/download/v3.11.0/hoomd-v3.11.0.tar.gz
+$ tar zxvf hoomd-v3.11.0.tar.gz
 ```
 
 Put source files of HOOMD-Angle-Cosine to HOOMD's `hoomd/md` directory.
 
 ```
 $ git clone https://github.com/t-murash/HOOMD-Angle-Cosine.git
-$ cp HOOMD-Angle-Cosine/src/* hoomd-blue-v3.7.0/hoomd/md/*
+$ cp HOOMD-Angle-Cosine/src/* hoomd-v3.11.0/hoomd/md/.
 ```
 
-Then, build HOOMD
+Then, build HOOMD-blue
 
 ```
-$ cd hoomd-blue-v3.7.0
-$ python3 install-prereq-headers.py
+$ cd hoomd-v3.11.0
 $ mkdir build
 $ cd build
-$ cmake ../ -DCMAKE_INSTALL_PREFIX=`python3 -c "import site; print(site.getsitepackages()[0])"` -DCMAKE_CXX_FLAGS="-march=native" -DCMAKE_C_FLAGS="-march=native" -DENABLE_GPU=ON -DENABLE_MPI=OFF -DSINGLE_PRECISION=ON
+$ cmake ../ -DCMAKE_INSTALL_PREFIX=`python -c "import site; print(site.getsitepackages()[0])"` -DCMAKE_CXX_FLAGS="-march=native" -DCMAKE_C_FLAGS="-march=native" -DENABLE_GPU=ON -DENABLE_MPI=OFF -DSINGLE_PRECISION=ON
 $ make -j64
 $ ctest
-$ make -j64 install
+$ make install
 ```
 
 ## Usage
@@ -52,14 +64,6 @@ $ python example/angle-cosine-test.py
 ```
 Please see `example/angle-cosine-test.py`.
 
-This script requires `numpy` and `gsd`.
-- [NumPy](https://numpy.org/)
-- [gsd](https://github.com/glotzerlab/gsd)
-
-Install `numpy` and `gsd` (if you have not installed these python modules)
-```
-$ python3 -m pip install numpy gsd
-```
 
 ## Technical note
 - [Derivation of angle force field](https://github.com/t-murash/HOOMD-Angle-Cosine/blob/master/doc/Angle-Cosine.pdf)

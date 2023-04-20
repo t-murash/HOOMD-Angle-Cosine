@@ -5,7 +5,7 @@ import numpy
 import datetime
 ###
 NP=100
-snapshot=gsd.hoomd.Snapshot()
+snapshot=gsd.hoomd.Frame()
 snapshot.particles.N=NP
 ###
 pos=[]
