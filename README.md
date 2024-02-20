@@ -15,7 +15,7 @@ Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
 Tohoku University, Japan<br>
 Initial commit: Mar 23, 2021<br>
-Last updated: Apr 20, 2023<br>
+Last updated: Feb 20, 2024<br>
 Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/issues) and/or [email](mailto:murasima@cmpt.phys.tohoku.ac.jp).
 
 
@@ -31,7 +31,7 @@ $ conda install pybind11
 $ conda install -c omnia eigen3
 $ conda install -c conda-forge cereal
 $ conda install numpy
-$ conda install -c conda-forge gsd
+$ conda install -c conda-forge gsd=2.9.0
 ```
 
 
@@ -56,7 +56,7 @@ $ conda activate hoomd-v3.11
 $ cd hoomd-v3.11.0
 $ mkdir build
 $ cd build
-$ cmake ../ -DCMAKE_INSTALL_PREFIX=`python -c "import site; print(site.getsitepackages()[0])"` -DCMAKE_CXX_FLAGS="-march=native" -DCMAKE_C_FLAGS="-march=native" -DENABLE_GPU=ON -DENABLE_MPI=OFF -DSINGLE_PRECISION=ON
+$ cmake ../ -DCMAKE_INSTALL_PREFIX=`python -c "import site; print(site.getsitepackages()[0])"` -DCMAKE_CXX_FLAGS="-march=native" -DCMAKE_C_FLAGS="-march=native" -DENABLE_GPU=ON -DENABLE_MPI=OFF -DSINGLE_PRECISION=ON -DCMAKE_CUDA_COMPILER=nvcc
 $ make -j64
 $ ctest
 $ make install
