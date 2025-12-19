@@ -16,7 +16,7 @@ Authored by:
 [Takahiro Murashima](https://github.com/t-murash)<br>
 Tohoku University, Japan<br>
 Initial commit: Mar 23, 2021<br>
-Last updated: Dec 18, 2025<br>
+Last updated: Dec 19, 2025<br>
 Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/issues) and/or [email](mailto:murasima@cmpt.phys.tohoku.ac.jp).
 
 
@@ -36,7 +36,7 @@ Ensure `~/.local/bin` is in your `PATH`.
 Create a new micromamba environment for HOOMD-blue v6.0.0.
 
 ```bash
-micromamba create -n hoomd-v6.0.0
+micromamba create -n hoomd-v6.0.0 python=3.14
 ```
 
 ### 1. Environment Preparation
