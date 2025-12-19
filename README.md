@@ -109,6 +109,10 @@ import hoomd
 print(f'HOOMD-blue version: {hoomd.version.version}')
 print(f'GPU support: {hoomd.version.gpu_enabled}')
 ```
+Or
+```bash
+python3 -c "import hoomd; print(f'HOOMD Version: {hoomd.version.version}'); print(f'GPU support: {hoomd.version.gpu_enabled}')"
+```
 Expected output:
 ```
 HOOMD-blue version: 6.0.0
