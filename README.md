@@ -25,7 +25,7 @@ Support provided via [issues](https://github.com/t-murash/HOOMD-Angle-Cosine/iss
 This section provides instructions for building and installing HOOMD-blue v6.0.0 from source with this extension.
 
 ### 0. Install Micromamba
-Micromamba is used for managing dependencies.
+Micromamba is used for managing dependencies. The installation will begin with the next command.
 ```bash
 "${SHELL}" <(curl -L micro.mamba.pm/install.sh)
 ```
