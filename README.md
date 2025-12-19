@@ -40,7 +40,7 @@ Prefix location? [~/micromamba] [Enter]
 
 Ensure `~/.local/bin` is in your `PATH`.
 ```bash
-export PATH="$HOME/.local/bin:$PATH"
+export PATH=$HOME/.local/bin:$PATH
 ```
 
 Create a new micromamba environment for HOOMD-blue v6.0.0.
