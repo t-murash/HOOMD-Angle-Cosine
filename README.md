@@ -27,11 +27,21 @@ This section provides instructions for building and installing HOOMD-blue v6.0.0
 ### 0. Install Micromamba
 Micromamba is used for managing dependencies.
 ```bash
-curl -Ls https://micro.mamba.pm/api/micromamba/linux-64/latest | tar -xvj -C /tmp bin/micromamba;
-mkdir -p ~/.local/bin;
-mv /tmp/bin/micromamba ~/.local/bin/;
+"${SHELL}" <(curl -L micro.mamba.pm/install.sh)
 ```
+When prompted as below, agree with everything.
+```bash
+Micromamba binary folder? [~/.local/bin] [Enter]
+Init shell (bash)? [Y/n] Y
+Configure conda-forge? [Y/n] Y
+Prefix location? [~/micromamba] [Enter]
+```
+
+
 Ensure `~/.local/bin` is in your `PATH`.
+```bash
+export PATH="$HOME/.local/bin:$PATH"
+```
 
 Create a new micromamba environment for HOOMD-blue v6.0.0.
 
